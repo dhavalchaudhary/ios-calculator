@@ -1,16 +1,42 @@
 import React, { useState, FunctionComponent } from "react";
+import styled from "@emotion/styled";
 
-const styles = {
-  row: {
-    display: "flex"
-  },
-  number: {
-    height: 30,
-    width: 30,
-    margin: 10,
-    cursor: "pointer"
-  }
-};
+const Row = styled.div`
+  display: flex;
+`;
+const Button = styled.div`
+  height: 60px;
+  width: 60px;
+  margin: 5px;
+  cursor: pointer;
+  border: 0px;
+  background: lightgrey;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  font-size: 22px;
+  line-height: 1.25;
+})`;
+
+const InputScreen = styled.div`
+  height: 60px;
+  font-size: 44px;
+  line-height: 1.25;
+  padding: 10px;
+  width: 100%;
+  overflow-x: scroll;
+  text-align: right;
+`;
+
+const Container = styled.div`
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+`;
 
 const Calculator: FunctionComponent = (): JSX.Element => {
   const [input, setInput] = useState<string>("");
@@ -135,100 +161,62 @@ const Calculator: FunctionComponent = (): JSX.Element => {
     console.log(lastEnteredOperatorPosition);
     if (input.length > 0 && lastEnteredOperatorPosition === 0) {
       setInput(
-        input[0] !== "-"
-          ? `-${roundToDecimal(parseFloat(input), 2)}`
-          : `${roundToDecimal(parseFloat(input.substr(1)), 2)}`
+        input[0] === "-"
+          ? `-${roundToDecimal(parseFloat(input.substr(1)), 2)}`
+          : `${roundToDecimal(parseFloat(input) / 100, 2)}`
       );
     }
   }
   return (
     <div>
-      <div>
-        <div style={styles.row}>{input}</div>
+      <Container>
+        <InputScreen>{input}</InputScreen>
         <div>
-          <div style={styles.row}>
-            <div style={styles.number} onClick={clearInput}>
-              AC
-            </div>
-            <div
+          <Row>
+            <Button onClick={clearInput}>AC</Button>
+            <Button
               style={
-                getLastEnteredOperatorPosition() > 0
-                  ? { ...styles.number, color: "gray" }
-                  : styles.number
+                getLastEnteredOperatorPosition() > 0 ? { color: "gray" } : {}
               }
               onClick={takePercent}
             >
               %
-            </div>
-            <div
+            </Button>
+            <Button
               style={
-                getLastEnteredOperatorPosition() > 0
-                  ? { ...styles.number, color: "gray" }
-                  : styles.number
+                getLastEnteredOperatorPosition() > 0 ? { color: "gray" } : {}
               }
               onClick={invertSign}
             >
               +/-
-            </div>
-            <div style={styles.number} onClick={() => addOperator("/")}>
-              /
-            </div>
-          </div>
-          <div style={styles.row}>
-            <div style={styles.number} onClick={() => addNumber(7)}>
-              7
-            </div>
-            <div style={styles.number} onClick={() => addNumber(8)}>
-              8
-            </div>
-            <div style={styles.number} onClick={() => addNumber(9)}>
-              9
-            </div>
-            <div style={styles.number} onClick={() => addOperator("*")}>
-              X
-            </div>
-          </div>
-          <div style={styles.row}>
-            <div style={styles.number} onClick={() => addNumber(4)}>
-              4
-            </div>
-            <div style={styles.number} onClick={() => addNumber(5)}>
-              5
-            </div>
-            <div style={styles.number} onClick={() => addNumber(6)}>
-              6
-            </div>
-            <div style={styles.number} onClick={() => addOperator("-")}>
-              -
-            </div>
-          </div>
-          <div style={styles.row}>
-            <div style={styles.number} onClick={() => addNumber(1)}>
-              1
-            </div>
-            <div style={styles.number} onClick={() => addNumber(2)}>
-              2
-            </div>
-            <div style={styles.number} onClick={() => addNumber(3)}>
-              3
-            </div>
-            <div style={styles.number} onClick={() => addOperator("+")}>
-              +
-            </div>
-          </div>
-          <div style={styles.row}>
-            <div style={styles.number} onClick={() => addNumber(0)}>
-              0
-            </div>
-            <div style={styles.number} onClick={() => addOperator(".")}>
-              .
-            </div>
-            <div style={styles.number} onClick={getResults}>
-              =
-            </div>
-          </div>
+            </Button>
+            <Button onClick={() => addOperator("/")}>/</Button>
+          </Row>
+          <Row>
+            <Button onClick={() => addNumber(7)}>7</Button>
+            <Button onClick={() => addNumber(8)}>8</Button>
+            <Button onClick={() => addNumber(9)}>9</Button>
+            <Button onClick={() => addOperator("*")}>X</Button>
+          </Row>
+          <Row>
+            <Button onClick={() => addNumber(4)}>4</Button>
+            <Button onClick={() => addNumber(5)}>5</Button>
+            <Button onClick={() => addNumber(6)}>6</Button>
+            <Button onClick={() => addOperator("-")}>-</Button>
+          </Row>
+          <Row>
+            <Button onClick={() => addNumber(1)}>1</Button>
+            <Button onClick={() => addNumber(2)}>2</Button>
+            <Button onClick={() => addNumber(3)}>3</Button>
+            <Button onClick={() => addOperator("+")}>+</Button>
+          </Row>
+          <Row>
+            <Button onClick={() => addNumber(0)}>0</Button>
+            <Button onClick={() => addOperator(".")}>.</Button>
+            <Button onClick={getResults}>=</Button>
+          </Row>
         </div>
-      </div>
+      </Container>
     </div>
   );
 };
