@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+  - "stable"
+script:
+  - npm run build
+deploy:
+  provider: surge
+  skip_cleanup: true
+  domain: react-typescript-ios-calculator.surge.sh
+  project: ./build/
+on: branch:master
