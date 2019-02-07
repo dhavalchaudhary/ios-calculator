@@ -4,20 +4,36 @@ import styled from "@emotion/styled";
 const Row = styled.div`
   display: flex;
 `;
+
+interface ButtonProps {
+  horizontallyExtended?: boolean;
+  primaryOperator?: boolean;
+  secondaryOperator?: boolean;
+}
+
 const Button = styled.div`
   height: 60px;
-  width: 60px;
+  width: ${(props: ButtonProps) => (props.horizontallyExtended ? 132 : 60)}px;
   margin: 5px;
   cursor: pointer;
   border: 0px;
-  background: lightgrey;
-  border-radius: 100%;
+  border-radius: ${(props: ButtonProps) =>
+    props.horizontallyExtended ? "35px" : "100%"};
   display: flex;
   justify-content: center;
   align-items: center;
-  color: black;
-  font-size: 22px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  font-size: ${props =>
+    props.primaryOperator || props.secondaryOperator ? 26 : 22}px;
   line-height: 1.25;
+  color: #ffffff;
+  background: ${(props: ButtonProps) =>
+    props.primaryOperator
+      ? "#ffa000"
+      : props.secondaryOperator
+      ? "#cccccc"
+      : "#464B4e"};
 })`;
 
 const InputScreen = styled.div`
@@ -25,9 +41,10 @@ const InputScreen = styled.div`
   font-size: 44px;
   line-height: 1.25;
   padding: 10px;
-  width: 100%;
+  width: calc(100% - 20px);
   overflow-x: scroll;
   text-align: right;
+  color: #ffffff;
 `;
 
 const Container = styled.div`
@@ -35,26 +52,36 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: auto;
+  margin: 0px auto;
+  background: #000000;
+  border-radius: 5px;
 `;
+
+type OperatorType = "+" | "-" | "×" | "÷";
 
 const Calculator: FunctionComponent = (): JSX.Element => {
   const [input, setInput] = useState<string>("");
   function addNumber(num: number) {
     setInput(input.length === 0 ? `${num}` : `${input}${num}`);
   }
-  function addOperator(operator: string) {
+  function addOperator(operator: string, displayValue?: string) {
+    let operatorValueToDisplay = displayValue ? displayValue : operator;
     if (input.length === 0) {
-      setInput(`0${operator}`);
+      setInput(`0${operatorValueToDisplay}`);
     } else {
-      if (getLastEnteredOperatorPosition() === input.length - 1) {
+      if (
+        input.length > 1 &&
+        getLastEnteredOperatorPosition() === input.length - 1
+      ) {
         if (operator === ".") {
-          setInput(`${input}0${operator}`);
+          setInput(`${input}0${operatorValueToDisplay}`);
         } else {
-          setInput(`${input.substr(0, input.length - 1)}${operator}`);
+          setInput(
+            `${input.substr(0, input.length - 1)}${operatorValueToDisplay}`
+          );
         }
       } else {
-        setInput(`${input}${operator}`);
+        setInput(`${input}${operatorValueToDisplay}`);
       }
     }
   }
@@ -62,7 +89,7 @@ const Calculator: FunctionComponent = (): JSX.Element => {
     setInput(``);
   }
   function getLastEnteredOperatorPosition(): number {
-    const operators = ["+", "-", "*", "/"];
+    const operators = ["+", "-", "×", "÷"];
     let lastOperatorIndex = input
       .split("")
       .reduce(
@@ -88,6 +115,7 @@ const Calculator: FunctionComponent = (): JSX.Element => {
     return Math.floor(floatNum * denominator) / denominator;
   }
   function getResults() {
+    debugger;
     function convertToFloat(num: string): number {
       if (num.substr(0, 1) === "-") {
         return 0 - parseFloat(num.substr(1));
@@ -107,10 +135,10 @@ const Calculator: FunctionComponent = (): JSX.Element => {
         case "+":
           result = firstNumber + lastNumber;
           break;
-        case "/":
+        case "÷":
           result = firstNumber / lastNumber;
           break;
-        case "*":
+        case "×":
           result = firstNumber * lastNumber;
           break;
         case "-":
@@ -124,7 +152,7 @@ const Calculator: FunctionComponent = (): JSX.Element => {
     }
 
     if (getLastEnteredOperatorPosition() !== input.length - 1) {
-      const operators = ["+", "-", "*", "/"];
+      const operators = ["+", "-", "×", "÷"];
       //adding 0 to take care of negative elements
       let operations: Array<string> = `0${input}`
         .split("")
@@ -173,12 +201,15 @@ const Calculator: FunctionComponent = (): JSX.Element => {
         <InputScreen>{input}</InputScreen>
         <div>
           <Row>
-            <Button onClick={clearInput}>AC</Button>
+            <Button onClick={clearInput} secondaryOperator>
+              C
+            </Button>
             <Button
               style={
                 getLastEnteredOperatorPosition() > 0 ? { color: "gray" } : {}
               }
               onClick={takePercent}
+              secondaryOperator
             >
               %
             </Button>
@@ -187,33 +218,46 @@ const Calculator: FunctionComponent = (): JSX.Element => {
                 getLastEnteredOperatorPosition() > 0 ? { color: "gray" } : {}
               }
               onClick={invertSign}
+              secondaryOperator
             >
               +/-
             </Button>
-            <Button onClick={() => addOperator("/")}>/</Button>
+            <Button onClick={() => addOperator("/", "÷")} primaryOperator>
+              ÷
+            </Button>
           </Row>
           <Row>
             <Button onClick={() => addNumber(7)}>7</Button>
             <Button onClick={() => addNumber(8)}>8</Button>
             <Button onClick={() => addNumber(9)}>9</Button>
-            <Button onClick={() => addOperator("*")}>X</Button>
+            <Button onClick={() => addOperator("×")} primaryOperator>
+              ×
+            </Button>
           </Row>
           <Row>
             <Button onClick={() => addNumber(4)}>4</Button>
             <Button onClick={() => addNumber(5)}>5</Button>
             <Button onClick={() => addNumber(6)}>6</Button>
-            <Button onClick={() => addOperator("-")}>-</Button>
+            <Button onClick={() => addOperator("-")} primaryOperator>
+              -
+            </Button>
           </Row>
           <Row>
             <Button onClick={() => addNumber(1)}>1</Button>
             <Button onClick={() => addNumber(2)}>2</Button>
             <Button onClick={() => addNumber(3)}>3</Button>
-            <Button onClick={() => addOperator("+")}>+</Button>
+            <Button onClick={() => addOperator("+")} primaryOperator>
+              +
+            </Button>
           </Row>
           <Row>
-            <Button onClick={() => addNumber(0)}>0</Button>
+            <Button onClick={() => addNumber(0)} horizontallyExtended>
+              0
+            </Button>
             <Button onClick={() => addOperator(".")}>.</Button>
-            <Button onClick={getResults}>=</Button>
+            <Button onClick={getResults} primaryOperator>
+              =
+            </Button>
           </Row>
         </div>
       </Container>
